@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SAKO Battery Pro</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU0FLTyBCYXR0ZXJ5IFBybyIsInNob3J0X25hbWUiOiJTQUtPIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzA5MDkwYiIsInRoZW1lX2NvbG9yIjoiIzA5MDkwYiIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDE5MiAxOTInJTNFJTNDcmVjdCB3aWR0aD0nMTkyJyBoZWlnaHQ9JzE5Micgcng9JzI0JyBmaWxsPScjMDkwOTBiJy8lM0UlM0N0ZXh0IHg9Jzk2JyB5PScxMTUnIGZvbnQtZmFtaWx5PSdzeXN0ZW0tdWksLWFwcGxlLXN5c3RlbSxCbGlua01hY1N5c3RlbUZvbnQsc2Fucy1zZXJpZicgZm9udC1zaXplPSc4MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nIzEwYjk4MSclM0UlMjYlMjM5OTk2OyUzQy90ZXh0JTNFJTNDL3N2ZyUzRSIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    <style>
+        :root {
+            --bg: #09090b; --card: #18181b; --border: #27272a;
+            --text: #fafafa; --muted: #a1a1aa; --dim: #71717a;
+            --primary: #10b981; --success: #22c55e; --danger: #ef4444;
+            --warning: #f59e0b; --info: #3b82f6; --accent: #8b5cf6;
+            --radius: 1rem; --radius-sm: 0.625rem;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px;
+            overflow-x: hidden; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
+
+        /* ═══════ ANIMATIONS ═══════ */
+        @keyframes fadeIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes fadeInScale { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
+        @keyframes pulse-ring { 0% { transform: scale(1); opacity:0.6; } 100% { transform: scale(2.2); opacity:0; } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .anim-fade { animation: fadeIn .45s cubic-bezier(.22,1,.36,1) both; }
+        .anim-scale { animation: fadeInScale .4s cubic-bezier(.22,1,.36,1) both; }
+
+        /* ═══════ HEADER ═══════ */
+        header { padding: 20px 16px 8px; position: sticky; top: 0; z-index: 50;
+            background: linear-gradient(180deg, rgba(9,9,11,0.92) 0%, rgba(9,9,11,0.6) 60%, transparent 100%);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+        header .subtitle { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+        .header-row { display: flex; align-items: center; justify-content: space-between; }
+        .header-badge { font-size: .65rem; padding: 3px 10px; border-radius: 20px; background: rgba(16,185,129,0.12);
+            color: var(--primary); border: 1px solid rgba(16,185,129,0.2); font-weight: 600; }
+
+        /* ═══════ CARDS ═══════ */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+            margin: 10px 16px; overflow: hidden;
+            transition: transform .2s, box-shadow .2s; }
+        .card:active { transform: scale(0.992); }
+        .card-glass { background: rgba(24,24,27,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(39,39,42,0.6); }
+        .card-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 0.82rem; font-weight: 700; letter-spacing: -0.01em; }
+        .card-body { padding: 16px; }
+
+        /* ═══════ BUTTONS ═══════ */
+        .btn { background: var(--primary); color: #020617; border: none; padding: 14px 20px;
+            border-radius: var(--radius-sm); font-size: 0.92rem; font-weight: 700; cursor: pointer;
+            width: 100%; touch-action: manipulation; transition: all .15s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.18); }
+        .btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(16,185,129,0.12); }
+        .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 14px rgba(239,68,68,0.18); }
+        .btn-danger:active { box-shadow: 0 2px 8px rgba(239,68,68,0.12); }
+        .btn-sm { width: auto; padding: 7px 14px; font-size: 0.72rem; background: rgba(39,39,42,0.6); color: var(--text);
+            border: 1px solid var(--border); font-weight: 600; box-shadow: none; border-radius: 8px; }
+        .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); box-shadow: none; }
+        .btn-ghost:active { background: rgba(255,255,255,0.03); }
+        .btn-info { background: var(--info); color: #020617; box-shadow: 0 4px 14px rgba(59,130,246,0.18); }
+
+        /* ═══════ STATUS ═══════ */
+        .status-bar { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+        .status-dot-wrap { position: relative; width: 12px; height: 12px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--dim); transition: all .3s; position: relative; z-index: 2; }
+        .status-dot.connected { background: var(--success); }
+        .status-dot.connecting { background: var(--warning); }
+        .status-dot-ring { position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--success); opacity: 0; z-index: 1; }
+        .status-dot.connected + .status-dot-ring { animation: pulse-ring 2s cubic-bezier(0,.55,.45,1) infinite; }
+        .status-text { color: var(--muted); font-size: 0.85rem; flex: 1; font-weight: 500; }
+
+        /* ═══════ RING ═══════ */
+        .ring-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto; }
+        .ring-wrap svg { transform: rotate(-90deg); filter: drop-shadow(0 0 12px rgba(16,185,129,0.15)); }
+        .ring-bg { fill: none; stroke: var(--border); stroke-width: 14; }
+        .ring-fill { fill: none; stroke: var(--success); stroke-width: 14; stroke-linecap: round;
+            transition: stroke-dashoffset .9s cubic-bezier(.22,1,.36,1), stroke .4s; }
+        .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; }
+        .ring-soc { font-size: 3.2rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums;
+            letter-spacing: -0.03em; }
+        .ring-label { font-size: .78rem; color: var(--muted); margin-top: 6px; font-weight: 500; }
+
+        /* ═══════ STATS ═══════ */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 16px; }
+        .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 14px 6px; text-align: center; transition: all .2s; }
+        .stat:hover { border-color: rgba(255,255,255,0.08); transform: translateY(-1px); }
+        .stat-label { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; font-weight: 600; }
+        .stat-value { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .stat-unit { font-size: .68rem; color: var(--dim); margin-top: 2px; }
+        .stat-skeleton { background: linear-gradient(90deg, rgba(39,39,42,0.5) 25%, rgba(39,39,42,0.8) 50%, rgba(39,39,42,0.5) 75%);
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; height: 18px; width: 60%; margin: 0 auto; }
+
+        /* ═══════ TIME CARD ═══════ */
+        .time-card { display: flex; align-items: center; gap: 14px; padding: 16px;
+            border: 1px solid var(--border); border-radius: var(--radius); margin: 0 16px 10px;
+            background: linear-gradient(135deg, rgba(24,24,27,0.9), rgba(24,24,27,0.6)); }
+        .time-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); }
+        .time-icon svg { width: 22px; height: 22px; stroke: var(--info); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .time-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+        .time-value { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+        .time-sub { font-size: .72rem; color: var(--dim); margin-top: 4px; }
+        .progress-bar { width: 100%; height: 5px; background: rgba(39,39,42,0.6); border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; border-radius: 3px; transition: width .6s cubic-bezier(.22,1,.36,1); }
+
+        /* ═══════ BADGES ═══════ */
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: .7rem; font-weight: 700;
+            letter-spacing: .02em; transition: all .3s; }
+        .badge-charging { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+        .badge-discharging { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.2); }
+        .badge-idle { background: rgba(113,113,122,0.1); color: var(--dim); border: 1px solid rgba(113,113,122,0.15); }
+
+        /* ═══════ BOTTOM NAV ═══════ */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+            background: linear-gradient(180deg, rgba(9,9,11,0.6) 0%, rgba(9,9,11,0.95) 40%);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(39,39,42,0.4); padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 16px;
+            color: var(--dim); font-size: .6rem; font-weight: 600; cursor: pointer; transition: all .2s;
+            border: none; background: none; touch-action: manipulation; }
+        .nav-item:active { transform: scale(0.9); }
+        .nav-item.active { color: var(--text); }
+        .nav-item.active .nav-icon { color: var(--primary); }
+        .nav-icon { width: 24px; height: 24px; transition: all .2s; }
+        .nav-indicator { position: absolute; bottom: 0; width: 40px; height: 3px; background: var(--primary);
+            border-radius: 3px 3px 0 0; transition: all .35s cubic-bezier(.22,1,.36,1); }
+
+        /* ═══════ CHART ═══════ */
+        .chart-wrap { position: relative; height: 220px; margin: 0 16px; background: var(--card);
+            border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .chart-svg { width: 100%; height: 100%; }
+        .chart-tooltip { position: absolute; background: rgba(24,24,27,0.97); border: 1px solid var(--border);
+            border-radius: 10px; padding: 8px 12px; font-size: .72rem; pointer-events: none; opacity: 0;
+            transition: opacity .15s; color: var(--text); z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .chart-legend { display: flex; gap: 16px; justify-content: center; margin: 10px 16px; flex-wrap: wrap; }
+        .chart-legend-item { display: flex; align-items: center; gap: 5px; font-size: .72rem; color: var(--muted); font-weight: 500; }
+        .chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* ═══════ SECTIONS ═══════ */
+        .section-title { font-size: .72rem; color: var(--muted); text-transform: uppercase;
+            letter-spacing: .06em; margin: 18px 16px 10px; font-weight: 700; }
+
+        /* ═══════ TEMP ═══════ */
+        .temp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 16px; }
+        .temp-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 12px 8px; text-align: center; font-size: .85rem; transition: all .2s; }
+        .temp-item:hover { border-color: rgba(255,255,255,0.08); }
+        .temp-item span { display: block; color: var(--muted); font-size: .6rem; margin-bottom: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+
+        /* ═══════ LOG ═══════ */
+        .log-container { background: #0c0c0e; border-radius: 10px; padding: 12px; font-family: ui-monospace, monospace;
+            font-size: .68rem; color: var(--muted); max-height: 220px; overflow-y: auto; line-height: 1.6;
+            border: 1px solid var(--border); }
+        .log-entry { margin-bottom: 3px; word-break: break-all; padding: 1px 0; }
+        .log-err { color: var(--danger); }
+        .log-ok  { color: var(--success); }
+        .log-warn{ color: var(--warning); }
+        .log-info{ color: var(--info); }
+
+        /* ═══════ HEX ═══════ */
+        .hex-grid { display: grid; grid-template-columns: 32px repeat(8, 1fr); gap: 2px;
+            font-family: 'SF Mono', ui-monospace, monospace; font-size: .62rem; }
+        .hex-cell { background: rgba(39,39,42,0.5); padding: 5px 1px; text-align: center;
+            border-radius: 3px; color: var(--muted); min-height: 24px;
+            display: flex; align-items: center; justify-content: center; transition: all .15s; }
+        .hex-cell:hover { transform: scale(1.15); z-index: 2; }
+        .hex-cell.hdr { background: transparent; color: var(--dim); font-weight: 700; }
+        .hex-cell.off { background: transparent; color: var(--dim); font-weight: 700; }
+        .hex-cell.data { color: var(--text); font-weight: 700; }
+        .hex-cell.hl-v  { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.35); }
+        .hex-cell.hl-i  { background: rgba(59,130,246,0.15); color: var(--info);    border: 1px solid rgba(59,130,246,0.35); }
+        .hex-cell.hl-c  { background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.35); }
+        .hex-cell.hl-t  { background: rgba(239,68,68,0.15);  color: var(--danger);  border: 1px solid rgba(239,68,68,0.35); }
+        .hex-cell.hl-soc{ background: rgba(139,92,246,0.15); color: #a78bfa;        border: 1px solid rgba(139,92,246,0.35); }
+        .hex-cell.hl-cyc{ background: rgba(236,72,153,0.15); color: #f472b6;        border: 1px solid rgba(236,72,153,0.35); }
+
+        .candidate-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+        .candidate-table th { text-align: left; padding: 8px 6px; color: var(--muted);
+            font-weight: 700; border-bottom: 1px solid var(--border); font-size: .6rem; text-transform: uppercase; letter-spacing: .04em; }
+        .candidate-table td { padding: 7px 6px; border-bottom: 1px solid var(--border); color: var(--text); }
+        .candidate-table tr:hover td { background: rgba(39,39,42,0.4); }
+        .match-exact { color: var(--success); font-weight: 700; }
+        .match-near  { color: var(--warning); font-weight: 600; }
+
+        /* ═══════ TOAST ═══════ */
+        .toast { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom) + 60px); left: 50%;
+            transform: translateX(-50%) translateY(140px);
+            background: rgba(24,24,27,0.97); border: 1px solid var(--border); color: var(--text);
+            padding: 12px 20px; border-radius: 14px; font-size: .85rem; z-index: 200;
+            transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5); backdrop-filter: blur(12px);
+            display: flex; align-items: center; gap: 8px; max-width: 90vw; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast-icon { font-size: 1.1rem; }
+
+        /* ═══════ MISC ═══════ */
+        .hidden { display: none !important; }
+        .install-hint { background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02));
+            border: 1px solid rgba(16,185,129,0.15); border-radius: var(--radius-sm);
+            padding: 12px 16px; margin: 0 16px 10px; font-size: .78rem; color: var(--muted); line-height: 1.5; }
+        .install-hint b { color: var(--success); }
+
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);
+            font-size: .82rem; color: var(--muted); }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-row span:last-child { color: var(--text); font-weight: 700; }
+
+        .db-controls { display: flex; gap: 8px; margin: 0 16px 10px; flex-wrap: wrap; }
+        .db-controls .btn { flex: 1; min-width: 120px; font-size: .78rem; padding: 10px; border-radius: 10px; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--dim); }
+        .empty-state svg { width: 56px; height: 56px; stroke: var(--dim); margin-bottom: 16px; opacity: .5; }
+        .empty-state h3 { font-size: 1rem; color: var(--text); margin-bottom: 6px; }
+        .empty-state p { font-size: .8rem; }
+
+        .bms-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);
+            font-size: .82rem; color: var(--muted); align-items: center; }
+        .bms-row:last-child { border-bottom: none; }
+        .bms-row span:last-child { color: var(--text); font-weight: 700; font-size: .85rem; }
+        .bms-tag { font-size: .65rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+
+        /* Pull to refresh indicator */
+        .ptr-indicator { position: fixed; top: -50px; left: 50%; transform: translateX(-50%);
+            z-index: 60; transition: top .25s ease, opacity .2s ease; display: flex; align-items: center; gap: 8px;
+            background: rgba(24,24,27,0.95); border: 1px solid var(--border); padding: 10px 18px;
+            border-radius: 24px; font-size: .78rem; color: var(--muted); font-weight: 600;
+            backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); opacity: 0; }
+        .ptr-indicator.visible { top: 16px; opacity: 1; }
+        .ptr-spinner { width: 14px; height: 14px; border: 2.5px solid var(--border); border-top-color: var(--primary);
+            border-radius: 50%; transition: transform .1s linear; }
+
+        /* View transitions */
+        .view-section { animation: fadeIn .35s cubic-bezier(.22,1,.36,1) both; }
+
+        /* Sparkline */
+        .sparkline-wrap { margin: 0 16px 10px; height: 40px; }
+        .sparkline { width: 100%; height: 100%; }
+
+        /* Connection card improvements */
+        .conn-info { font-size: .75rem; color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.5; }
+        .conn-info a { color: var(--info); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="ptr-indicator" id="ptrIndicator">
+        <div class="ptr-spinner"></div> Sincronizando…
+    </div>
+
+    <header>
+        <div class="header-row">
+            <div>
+                <h1>SAKO Battery</h1>
+                <div class="subtitle" id="headerSub">Monitor BLE · Persistencia · Historial</div>
+            </div>
+            <div class="header-badge hidden" id="liveBadge">● LIVE</div>
+        </div>
+    </header>
+
+    <div class="install-hint hidden anim-fade" id="installHint">
+        💡 <b>Consejo:</b> Toca ⋮ y selecciona <b>"Añadir a pantalla de inicio"</b> para usarla como app nativa.
+    </div>
+
+    <!-- CONNECT -->
+    <div class="card anim-fade" id="connectCard" style="animation-delay:.05s">
+        <div class="status-bar">
+            <div class="status-dot-wrap">
+                <div class="status-dot" id="statusDot"></div>
+                <div class="status-dot-ring" id="statusRing"></div>
+            </div>
+            <span class="status-text" id="statusText">Desconectado</span>
+            <span class="badge badge-idle" id="connBadge">BLE</span>
+        </div>
+        <div style="padding: 0 16px 16px;">
+            <button class="btn" id="connectBtn" onclick="connect()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                Conectar batería SAKO
+            </button>
+            <button class="btn btn-info hidden" id="reconnectBtn" onclick="quickReconnect()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Reconectar rápido
+            </button>
+            <button class="btn btn-danger hidden" id="disconnectBtn" onclick="disconnect()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Desconectar
+            </button>
+            <div class="conn-info" id="autoConnectMsg"></div>
+            <div class="conn-info" id="bleSupportMsg" style="font-size:.68rem;color:var(--dim);"></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="viewDashboard" class="view-section hidden">
+        <div style="display:flex; justify-content:center; padding: 14px 0 6px;">
+            <div class="ring-wrap">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <circle class="ring-bg" cx="100" cy="100" r="82"/>
+                    <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="82"
+                        stroke-dasharray="515.22" stroke-dashoffset="128.81"/>
+                </svg>
+                <div class="ring-center">
+                    <div class="ring-soc" id="dashSoc">--%</div>
+                    <div class="ring-label" id="dashCapLabel">320 Ah</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mini sparkline -->
+        <div class="sparkline-wrap hidden" id="sparkWrap">
+            <svg class="sparkline" id="sparkSvg" viewBox="0 0 300 40" preserveAspectRatio="none">
+                <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(16,185,129,0.3)"/><stop offset="100%" stop-color="rgba(16,185,129,0)"/></linearGradient></defs>
+                <path id="sparkPath" fill="none" stroke="var(--success)" stroke-width="1.5" stroke-linejoin="round"/>
+                <path id="sparkArea" fill="url(#sparkGrad)"/>
+            </svg>
+        </div>
+
+        <div class="time-card anim-fade" style="animation-delay:.1s">
+            <div class="time-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+                <div class="time-label" id="dashTimeLabel">Tiempo restante</div>
+                <div class="time-value" id="dashTime">—</div>
+                <div class="time-sub" id="dashTimeSub"></div>
+                <div class="progress-bar"><div class="progress-fill" id="timeProgress" style="width:0%; background:var(--success);"></div></div>
+            </div>
+        </div>
+
+        <div class="stats-grid anim-fade" style="animation-delay:.15s">
+            <div class="stat"><div class="stat-label">Voltaje</div><div class="stat-value" id="dashV">—</div><div class="stat-unit">V</div></div>
+            <div class="stat"><div class="stat-label">Corriente</div><div class="stat-value" id="dashI">—</div><div class="stat-unit">A</div></div>
+            <div class="stat"><div class="stat-label">Potencia</div><div class="stat-value" id="dashP">—</div><div class="stat-unit">W</div></div>
+            <div class="stat"><div class="stat-label">Cap. rest.</div><div class="stat-value" id="dashCapRem">—</div><div class="stat-unit">Ah</div></div>
+            <div class="stat"><div class="stat-label">Cap. total</div><div class="stat-value" id="dashCapTot">—</div><div class="stat-unit">Ah</div></div>
+            <div class="stat"><div class="stat-label">Ciclos</div><div class="stat-value" id="dashCyc">—</div><div class="stat-unit">#</div></div>
+            <div class="stat"><div class="stat-label">Celdas</div><div class="stat-value" id="dashCells">—</div><div class="stat-unit">S</div></div>
+            <div class="stat"><div class="stat-label">Versión SW</div><div class="stat-value" id="dashVer">—</div><div class="stat-unit"></div></div>
+            <div class="stat"><div class="stat-label">Protección</div><div class="stat-value" id="dashProt">—</div><div class="stat-unit"></div></div>
+        </div>
+
+        <div class="section-title">Temperaturas</div>
+        <div class="temp-grid" id="tempGrid"></div>
+
+        <div class="section-title">Estado del BMS</div>
+        <div class="card" style="margin-top:0;">
+            <div class="card-body" style="padding: 8px 16px;">
+                <div class="bms-row"><span>MOSFET carga</span><span id="dashFetChg">—</span></div>
+                <div class="bms-row"><span>MOSFET descarga</span><span id="dashFetDsc">—</span></div>
+                <div class="bms-row"><span>Balance</span><span id="dashBal">—</span></div>
+                <div class="bms-row"><span>Último paquete</span><span id="dashLast">—</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="viewHistory" class="view-section hidden">
+        <div class="section-title">Gráfico de tendencias</div>
+        <div class="chart-wrap" id="chartWrap">
+            <svg class="chart-svg" id="chartSvg" viewBox="0 0 640 220" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="gradV" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(16,185,129,0.22)"/><stop offset="100%" stop-color="rgba(16,185,129,0)"/>
+                    </linearGradient>
+                    <linearGradient id="gradI" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(59,130,246,0.22)"/><stop offset="100%" stop-color="rgba(59,130,246,0)"/>
+                    </linearGradient>
+                    <linearGradient id="gradSOC" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(139,92,246,0.12)"/><stop offset="100%" stop-color="rgba(139,92,246,0)"/>
+                    </linearGradient>
+                </defs>
+                <g id="chartGrid" stroke="var(--border)" stroke-width="0.5" opacity="0.4"></g>
+                <g id="chartLabels" font-size="9" fill="var(--dim)" font-family="ui-monospace,monospace"></g>
+                <path id="areaV" fill="url(#gradV)" />
+                <path id="areaI" fill="url(#gradI)" />
+                <path id="pathV" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linejoin="round" />
+                <path id="pathI" fill="none" stroke="var(--info)" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="4,3" />
+                <path id="pathSOC" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linejoin="round" opacity="0.7" />
+                <path id="areaSOC" fill="url(#gradSOC)" opacity="0.35" />
+                <g id="pointsV"></g><g id="pointsI"></g><g id="pointsSOC"></g>
+                <line id="zeroLine" stroke="var(--dim)" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5" />
+            </svg>
+            <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+        <div class="chart-legend">
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--success)"></div>Voltaje</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--info)"></div>Corriente</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#a78bfa"></div>SOC</div>
+        </div>
+
+        <div class="section-title">Estadísticas de sesión</div>
+        <div class="card" style="margin-top:0;">
+            <div class="card-body" id="statsBody">
+                <div class="stat-row"><span>Lecturas almacenadas</span><span id="statCount">—</span></div>
+                <div class="stat-row"><span>Primera lectura</span><span id="statFirst">—</span></div>
+                <div class="stat-row"><span>Última lectura</span><span id="statLast">—</span></div>
+                <div class="stat-row"><span>Voltaje máx. / mín.</span><span id="statVrange">—</span></div>
+                <div class="stat-row"><span>Corriente máx. / mín.</span><span id="statIrange">—</span></div>
+                <div class="stat-row"><span>SOC promedio</span><span id="statSocAvg">—</span></div>
+                <div class="stat-row"><span>SOC máx. / mín.</span><span id="statSOCrange">—</span></div>
+            </div>
+        </div>
+
+        <div class="db-controls">
+            <button class="btn btn-ghost" onclick="exportCSV()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exportar CSV
+            </button>
+            <button class="btn btn-ghost" onclick="clearHistory()" style="color:var(--danger);border-color:rgba(239,68,68,0.3)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                Borrar historial
+            </button>
+        </div>
+    </div>
+
+    <!-- INSPECTOR -->
+    <div id="viewInspector" class="view-section hidden">
+        <div class="card anim-fade" style="animation-delay:.05s">
+            <div class="card-header">
+                <span class="card-title">🧬 Hex dump · paquete 0x03</span>
+                <button class="btn btn-sm" onclick="clearPackets()">Limpiar</button>
+            </div>
+            <div class="card-body">
+                <div id="hexDump" style="color:var(--muted); font-size:.8rem; text-align:center; padding:30px 20px;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:10px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><br/>
+                    Conecta y espera un paquete…
+                </div>
+                <div style="margin-top:12px; font-size:.62rem; color:var(--dim); display:flex; flex-wrap:wrap; gap:10px;">
+                    <span><span class="hex-cell hl-v" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> Voltaje</span>
+                    <span><span class="hex-cell hl-i" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> Corriente</span>
+                    <span><span class="hex-cell hl-c" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> Capacidad</span>
+                    <span><span class="hex-cell hl-cyc" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> Ciclos</span>
+                    <span><span class="hex-cell hl-soc" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> SOC</span>
+                    <span><span class="hex-cell hl-t" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> Temp</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card anim-fade" style="animation-delay:.1s">
+            <div class="card-header"><span class="card-title">🔎 Candidatos (todos los offsets)</span></div>
+            <div class="card-body" style="padding:0; overflow-x:auto;">
+                <table class="candidate-table">
+                    <thead><tr>
+                        <th>Off</th><th>Hex</th><th>u8</th><th>u16BE/100</th><th>u16LE/100</th>
+                        <th>i16BE/100</th><th>i16LE/100</th><th>u16BE/10−273</th><th>Campo JBD</th>
+                    </tr></thead>
+                    <tbody id="candidateBody"><tr><td colspan="9" style="text-align:center;color:var(--muted);padding:30px 20px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><br/>Esperando paquetes…
+                    </td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card anim-fade" style="animation-delay:.15s">
+            <div class="card-header"><span class="card-title">📋 Log</span></div>
+            <div class="card-body">
+                <div class="log-container" id="log"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-indicator" id="navIndicator" style="left:0"></div>
+        <button class="nav-item active" onclick="setMode('dashboard')" data-mode="dashboard">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </button>
+        <button class="nav-item" onclick="setMode('history')" data-mode="history">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Historial
+        </button>
+        <button class="nav-item" onclick="setMode('inspector')" data-mode="inspector">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Inspector
+        </button>
+    </nav>
+
+    <div class="toast" id="toast"><span class="toast-icon" id="toastIcon">ℹ️</span><span id="toastText"></span></div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        //  PWA Service Worker
+        // ═══════════════════════════════════════════════════════════════
+        if('serviceWorker' in navigator){
+            const swCode = `self.addEventListener('install',e=>self.skipWaiting()); self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>new Response('Offline', {status:503}))));`;
+            const swBlob = new Blob([swCode], {type:'application/javascript'});
+            const swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl).catch(()=>{});
+        }
+
+        if(!localStorage.getItem('sako_hint_shown')){
+            setTimeout(()=>{ $('installHint').classList.remove('hidden'); }, 2500);
+            localStorage.setItem('sako_hint_shown', '1');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  CONSTANTS
+        // ═══════════════════════════════════════════════════════════════
+        const JBD_SERVICE = 0xFF00;
+        const JBD_RX      = 0xFF01;
+        const JBD_TX      = 0xFF02;
+        const CMD_INFO    = new Uint8Array([0xDD,0xA5,0x03,0x00,0xFF,0xFD,0x77]);
+
+        // ═══════════════════════════════════════════════════════════════
+        //  STATE
+        // ═══════════════════════════════════════════════════════════════
+        let device=null, server=null, service=null, rxChar=null, txChar=null;
+        let isConnected=false, pollInterval=null;
+        let rxBuffer = [];
+        let lastPacket03 = null;
+        let viewMode = 'dashboard';
+        let packetCount = 0;
+        let lastDataTime = 0;
+        let db = null;
+        let chartData = [];
+        let recentVoltages = [];
+
+        // ═══════════════════════════════════════════════════════════════
+        //  HAPTIC
+        // ═══════════════════════════════════════════════════════════════
+        function haptic(ms=12) {
+            if (navigator.vibrate) navigator.vibrate(ms);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  INDEXEDDB
+        // ═══════════════════════════════════════════════════════════════
+        const DB_NAME = 'SakoBatteryDB';
+        const DB_VERSION = 1;
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onerror = () => reject(req.error);
+                req.onsuccess = () => resolve(req.result);
+                req.onupgradeneeded = (e) => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains('readings')) {
+                        const store = database.createObjectStore('readings', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('timestamp', 'timestamp', { unique: false });
+                    }
+                    if (!database.objectStoreNames.contains('settings')) {
+                        database.createObjectStore('settings', { keyPath: 'key' });
+                    }
+                };
+            });
+        }
+
+        async function saveSetting(key, value) {
+            if (!db) return;
+            const tx = db.transaction('settings', 'readwrite');
+            const store = tx.objectStore('settings');
+            await store.put({ key, value, updated: Date.now() });
+        }
+        async function getSetting(key, defaultValue = null) {
+            if (!db) return defaultValue;
+            return new Promise((resolve) => {
+                const tx = db.transaction('settings', 'readonly');
+                const store = tx.objectStore('settings');
+                const req = store.get(key);
+                req.onsuccess = () => resolve(req.result ? req.result.value : defaultValue);
+                req.onerror = () => resolve(defaultValue);
+            });
+        }
+        async function saveReading(data) {
+            if (!db) return;
+            const tx = db.transaction('readings', 'readwrite');
+            const store = tx.objectStore('readings');
+            await store.add({
+                timestamp: Date.now(),
+                voltage: data.voltage,
+                current: data.current,
+                power: data.power,
+                soc: data.soc,
+                capacityRemaining: data.capacityRemaining,
+                capacityTotal: data.capacityTotal,
+                cycles: data.cycles,
+                temperature: data.temperatures,
+                fetStatus: data.fetStatus,
+                protStatus: data.protStatus,
+                cellCount: data.cellCount
+            });
+            const countReq = store.count();
+            countReq.onsuccess = async () => {
+                if (countReq.result > 5000) {
+                    const all = await getAllReadings();
+                    if (all.length > 5000) {
+                        const toDelete = all.slice(0, all.length - 5000);
+                        const tx2 = db.transaction('readings', 'readwrite');
+                        const s2 = tx2.objectStore('readings');
+                        for (const r of toDelete) s2.delete(r.id);
+                    }
+                }
+            };
+        }
+        async function getAllReadings() {
+            if (!db) return [];
+            return new Promise((resolve) => {
+                const tx = db.transaction('readings', 'readonly');
+                const store = tx.objectStore('readings');
+                const idx = store.index('timestamp');
+                const req = idx.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+        }
+        async function clearAllReadings() {
+            if (!db) return;
+            const tx = db.transaction('readings', 'readwrite');
+            const store = tx.objectStore('readings');
+            await store.clear();
+            chartData = [];
+            renderChart();
+            updateStats();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  UTILS
+        // ═══════════════════════════════════════════════════════════════
+        function $(id){ return document.getElementById(id); }
+        function showToast(msg, type='info', d=3000){
+            const t=$('toast');
+            const icon = type==='success'?'✅':type==='error'?'❌':type==='warn'?'⚠️':'ℹ️';
+            $('toastIcon').textContent = icon;
+            $('toastText').textContent = msg;
+            t.classList.add('show');
+            setTimeout(()=>t.classList.remove('show'), d);
+        }
+        function log(msg, cls=''){
+            const c=$('log'); if(!c) return;
+            const e=document.createElement('div'); e.className='log-entry '+cls;
+            const ts = new Date().toLocaleTimeString('es-ES',{hour12:false});
+            e.textContent = '['+ts+'] '+msg;
+            c.appendChild(e); c.scrollTop=c.scrollHeight;
+            while(c.children.length>120) c.removeChild(c.firstChild);
+        }
+        function bytesToHex(b){ return Array.from(b).map(x=>x.toString(16).padStart(2,'0').toUpperCase()).join(' '); }
+        function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  CHECKSUM
+        // ═══════════════════════════════════════════════════════════════
+        function calcChecksumStandard(packet, dataLen){
+            let sum = packet[1] + packet[2] + packet[3];
+            for(let i=4; i<4+dataLen; i++) sum += packet[i];
+            return (0x10000 - sum) & 0xFFFF;
+        }
+        function calcChecksumSako(packet, dataLen){
+            let sum = packet[2] + packet[3];
+            for(let i=4; i<4+dataLen; i++) sum += packet[i];
+            return (0x10000 - sum) & 0xFFFF;
+        }
+        function verifyChecksum(packet){
+            const dataLen = packet[3];
+            const csOffset = 4 + dataLen;
+            if(packet.length < csOffset + 2) return { ok:false, mode:'short' };
+            if(packet[packet.length-1] !== 0x77) return { ok:false, mode:'no-end' };
+            const rx = (packet[csOffset]<<8) | packet[csOffset+1];
+            const std = calcChecksumStandard(packet, dataLen);
+            const sako = calcChecksumSako(packet, dataLen);
+            if(rx === std) return { ok:true, mode:'std', rx, std, sako };
+            if(rx === sako) return { ok:true, mode:'sako', rx, std, sako };
+            return { ok:false, mode:'fail', rx, std, sako };
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  AUTO-CONNECT
+        // ═══════════════════════════════════════════════════════════════
+        async function tryAutoConnect() {
+            const lastId = await getSetting('lastDeviceId');
+            const lastName = await getSetting('lastDeviceName', '');
+            const autoConnect = await getSetting('autoConnect', true);
+
+            if (!navigator.bluetooth) {
+                $('bleSupportMsg').textContent = '❌ Web Bluetooth no disponible. Usa Chrome/Edge/Samsung Internet.';
+                return false;
+            }
+            if (lastId && lastName) {
+                $('reconnectBtn').textContent = '⚡ Reconectar ' + lastName;
+                $('reconnectBtn').classList.remove('hidden');
+                $('connectBtn').classList.add('hidden');
+            }
+            if (!lastId || !autoConnect) return false;
+
+            if (navigator.bluetooth.getDevices) {
+                try {
+                    $('statusDot').classList.add('connecting');
+                    $('statusText').textContent = 'Buscando…';
+                    $('autoConnectMsg').textContent = '🔍 Buscando ' + lastName + '…';
+                    const devices = await navigator.bluetooth.getDevices();
+                    const prev = devices.find(d => d.id === lastId);
+                    if (prev) {
+                        const ok = await doConnect(prev, true);
+                        if (ok) return true;
+                    }
+                } catch (err) {
+                    log('getDevices() falló: ' + err.message, 'log-warn');
+                }
+            }
+            $('statusDot').classList.remove('connecting');
+            $('statusText').textContent = 'Desconectado';
+            if (navigator.bluetooth.getDevices) {
+                $('autoConnectMsg').textContent = '⚠️ Permisos BLE expirados. Usa "Reconectar rápido".';
+            } else {
+                $('autoConnectMsg').textContent = 'ℹ️ Autoconexión no soportada. Usa "Reconectar rápido".';
+                $('bleSupportMsg').textContent = 'Puede necesitar chrome://flags/#enable-experimental-web-platform-features';
+            }
+            return false;
+        }
+
+        async function quickReconnect() {
+            haptic(20);
+            const lastName = await getSetting('lastDeviceName', '');
+            log('Reconexión rápida a: ' + (lastName || 'dispositivo guardado'));
+            try {
+                $('connectBtn').disabled = true;
+                $('reconnectBtn').disabled = true;
+                $('statusDot').classList.add('connecting');
+                $('statusText').textContent = 'Solicitando…';
+                let dev;
+                try {
+                    if (lastName && lastName.length > 2) {
+                        dev = await navigator.bluetooth.requestDevice({
+                            filters: [{ namePrefix: lastName.substring(0, Math.min(8, lastName.length)) }],
+                            optionalServices: [JBD_SERVICE]
+                        });
+                    } else throw new Error('No name');
+                } catch (e) {
+                    dev = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: [JBD_SERVICE]
+                    });
+                }
+                if (dev) {
+                    await saveSetting('lastDeviceId', dev.id);
+                    await saveSetting('lastDeviceName', dev.name || 'SAKO');
+                    await doConnect(dev, false);
+                }
+            } catch (err) {
+                log('Reconexión rápida fallida: ' + err.message, 'log-err');
+                showToast(err.message, 'error');
+            } finally {
+                $('connectBtn').disabled = false;
+                $('reconnectBtn').disabled = false;
+                $('statusDot').classList.remove('connecting');
+            }
+        }
+
+        async function doConnect(dev, isAuto) {
+            try {
+                device = dev;
+                log((isAuto ? 'Autoconectando' : 'Conectando') + ' a: ' + (device.name || 'Sin nombre'));
+                device.addEventListener('gattserverdisconnected', onDisconnected);
+                server = await device.gatt.connect();
+                log('GATT conectado');
+                service = await server.getPrimaryService(JBD_SERVICE);
+                rxChar = await service.getCharacteristic(JBD_RX);
+                await rxChar.startNotifications();
+                rxChar.addEventListener('characteristicvaluechanged', handleNotification);
+                txChar = await service.getCharacteristic(JBD_TX);
+                isConnected = true;
+
+                await saveSetting('lastDeviceId', device.id);
+                await saveSetting('lastDeviceName', device.name || 'SAKO');
+                await saveSetting('autoConnect', true);
+
+                $('statusDot').classList.remove('connecting');
+                $('statusDot').classList.add('connected');
+                $('statusText').textContent = 'Conectado · ' + (device.name || 'SAKO');
+                $('connBadge').textContent = 'LIVE';
+                $('connBadge').className = 'badge badge-charging';
+                $('connectBtn').classList.add('hidden');
+                $('reconnectBtn').classList.add('hidden');
+                $('disconnectBtn').classList.remove('hidden');
+                $('liveBadge').classList.remove('hidden');
+                $('modeRow') && $('modeRow').classList.remove('hidden');
+                $(viewMode==='dashboard'?'viewDashboard': viewMode==='history'?'viewHistory':'viewInspector').classList.remove('hidden');
+                $('autoConnectMsg').textContent = isAuto ? '✅ Reconectado automáticamente' : '✅ Conectado. Se recordará para la próxima vez.';
+                $('bleSupportMsg').textContent = '';
+                showToast((isAuto ? 'Autoconectado' : 'Conectado') + ' a ' + (device.name || 'BMS'), 'success');
+                haptic([30, 50, 30]);
+
+                await sendCmd(CMD_INFO); await sleep(600);
+                await sendCmd(CMD_INFO); await sleep(600);
+                await sendCmd(CMD_INFO);
+
+                pollInterval = setInterval(()=>{
+                    if(isConnected) sendCmd(CMD_INFO);
+                }, 4000);
+                return true;
+            } catch (err) {
+                $('statusDot').classList.remove('connecting');
+                $('statusText').textContent = 'Desconectado';
+                $('autoConnectMsg').textContent = 'Error: ' + err.message;
+                log('Error de conexión: ' + err.message, 'log-err');
+                device = null;
+                return false;
+            }
+        }
+
+        async function connect(){
+            haptic(20);
+            log('Solicitando dispositivo BLE…');
+            try{
+                if(!navigator.bluetooth){ showToast('Usa Chrome/Edge en Android/PC', 'warn'); return; }
+                $('connectBtn').disabled = true;
+                const dev = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: [JBD_SERVICE]
+                });
+                await doConnect(dev, false);
+            }catch(err){
+                log('Error: '+err.message, 'log-err');
+                showToast(err.message, 'error');
+                $('connectBtn').disabled = false;
+            }
+        }
+
+        async function sendCmd(cmd){
+            if(!txChar) return;
+            try{ await txChar.writeValueWithoutResponse(cmd); }
+            catch(e){ try{ await txChar.writeValue(cmd); } catch(e2){} }
+        }
+
+        async function disconnect(){
+            haptic(20);
+            isConnected = false;
+            if(pollInterval){ clearInterval(pollInterval); pollInterval = null; }
+            if(device && device.gatt.connected){
+                try{ await device.gatt.disconnect(); }catch(e){}
+            }
+            await onDisconnected();
+        }
+
+        async function onDisconnected(){
+            isConnected = false;
+            if(pollInterval){ clearInterval(pollInterval); pollInterval = null; }
+            $('statusDot').classList.remove('connected');
+            $('statusDot').classList.remove('connecting');
+            $('statusText').textContent = 'Desconectado';
+            $('connBadge').textContent = 'BLE';
+            $('connBadge').className = 'badge badge-idle';
+            $('connectBtn').classList.remove('hidden');
+            $('connectBtn').disabled = false;
+            $('disconnectBtn').classList.add('hidden');
+            $('liveBadge').classList.add('hidden');
+            $('viewDashboard').classList.add('hidden');
+            $('viewHistory').classList.add('hidden');
+            $('viewInspector').classList.add('hidden');
+            device = server = service = rxChar = txChar = null;
+            rxBuffer = [];
+            $('autoConnectMsg').textContent = '';
+            $('bleSupportMsg').textContent = '';
+            const lastName = await getSetting('lastDeviceName', '');
+            if (lastName) {
+                $('reconnectBtn').textContent = '⚡ Reconectar ' + lastName;
+                $('reconnectBtn').classList.remove('hidden');
+                $('connectBtn').classList.add('hidden');
+            }
+        }
+
+        function setMode(mode){
+            haptic(8);
+            viewMode = mode;
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.mode === mode);
+            });
+            // Move indicator
+            const activeBtn = document.querySelector('.nav-item[data-mode="'+mode+'"]');
+            if (activeBtn) {
+                const nav = $('bottomNav');
+                const indicator = $('navIndicator');
+                const rect = activeBtn.getBoundingClientRect();
+                const navRect = nav.getBoundingClientRect();
+                indicator.style.left = (rect.left - navRect.left + rect.width/2 - 20) + 'px';
+            }
+            // Switch views
+            $('viewDashboard').classList.toggle('hidden', mode!=='dashboard');
+            $('viewHistory').classList.toggle('hidden', mode!=='history');
+            $('viewInspector').classList.toggle('hidden', mode!=='inspector');
+            if (mode === 'history') loadChartData();
+        }
+
+        function clearPackets(){
+            haptic(8);
+            lastPacket03 = null;
+            $('hexDump').innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:10px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><br/>Conecta y espera un paquete…';
+            $('candidateBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:30px 20px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><br/>Esperando paquetes…</td></tr>';
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  BLE HANDLER
+        // ═══════════════════════════════════════════════════════════════
+        function handleNotification(event){
+            const value = event.target.value;
+            const bytes = new Uint8Array(value.buffer);
+            for(let i=0;i<bytes.length;i++) rxBuffer.push(bytes[i]);
+            parseBuffer();
+        }
+
+        function parseBuffer(){
+            while(rxBuffer.length >= 7){
+                const startIdx = rxBuffer.indexOf(0xDD);
+                if(startIdx === -1){ rxBuffer = []; break; }
+                if(rxBuffer.length < startIdx + 7) break;
+                const resp = rxBuffer[startIdx + 1];
+                const status = rxBuffer[startIdx + 2];
+                const dataLen = rxBuffer[startIdx + 3];
+                const totalLen = dataLen + 7;
+                if(rxBuffer.length < startIdx + totalLen) break;
+                if(rxBuffer[startIdx + totalLen - 1] !== 0x77){
+                    log('Bad end byte, skipping…', 'log-warn');
+                    rxBuffer = rxBuffer.slice(startIdx + 1);
+                    continue;
+                }
+                const packet = new Uint8Array(rxBuffer.slice(startIdx, startIdx + totalLen));
+                rxBuffer = rxBuffer.slice(startIdx + totalLen);
+                const cs = verifyChecksum(packet);
+                const csOffset = 4 + dataLen;
+                const csRx = (packet[csOffset]<<8)|packet[csOffset+1];
+                log('PKT #'+(++packetCount)+' '+totalLen+'B  resp=0x'+resp.toString(16).padStart(2,'0')+
+                    '  len='+dataLen+'  CS='+(cs.ok?cs.mode.toUpperCase()+' OK':'FAIL')+
+                    '  rx='+csRx.toString(16).toUpperCase().padStart(4,'0'),
+                    cs.ok?'log-ok':'log-err');
+                if(!cs.ok) continue;
+                if(status !== 0x00){ log('BMS error 0x'+status.toString(16).padStart(2,'0'), 'log-err'); continue; }
+                if(resp === 0x03){
+                    lastPacket03 = packet;
+                    lastDataTime = Date.now();
+                    const data = packet.slice(4, 4 + dataLen);
+                    parseJBD03(data, dataLen);
+                    if(viewMode === 'inspector') inspectPacket(packet, dataLen);
+                }
+            }
+            if(rxBuffer.length > 600) rxBuffer = rxBuffer.slice(-250);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  JBD PARSER
+        // ═══════════════════════════════════════════════════════════════
+        function parseJBD03(data, dataLen){
+            if(dataLen < 20) { log('Datos 0x03 muy cortos ('+dataLen+')', 'log-warn'); return; }
+            const u16be = (o)=> (data[o]<<8)|data[o+1];
+            const i16be = (o)=> { const v=(data[o]<<8)|data[o+1]; return v>32767?v-65536:v; };
+            const kelvinToC = (o)=> { const v=u16be(o); return v===0?null:((v/10)-273.15).toFixed(1); };
+
+            const voltage = (u16be(0)/100).toFixed(2);
+            const current = (i16be(2)/100).toFixed(2);
+            const capRem = (u16be(4)/100).toFixed(2);
+            const capTot = (u16be(6)/100).toFixed(2);
+            const cycles = u16be(8);
+            const balLow = u16be(12);
+            const balHigh = u16be(14);
+            const protStatus = data[16];
+            const swVersion = data[17];
+            const socByte = data[18];
+            const fetStatus = data[19];
+            const cellCount = dataLen > 20 ? data[20] : 0;
+            const ntcBytes = dataLen > 21 ? data[21] : 0;
+
+            const temps = [];
+            const ntcCount = Math.floor(ntcBytes / 2);
+            for(let i=0; i<ntcCount; i++){
+                const off = 22 + i*2;
+                if(off+1 < dataLen){
+                    const t = kelvinToC(off);
+                    if(t !== null) temps.push(parseFloat(t));
+                }
+            }
+
+            const capRemNum = parseFloat(capRem);
+            const capTotNum = parseFloat(capTot);
+            let soc = capTotNum > 0 ? Math.round((capRemNum / capTotNum) * 100) : socByte;
+            if(soc < 0) soc = 0; if(soc > 100) soc = 100;
+
+            const power = (parseFloat(voltage) * parseFloat(current)).toFixed(0);
+            const isCharging = parseFloat(current) > 0.5;
+            const isDischarging = parseFloat(current) < -0.5;
+            const curAbs = Math.abs(parseFloat(current));
+
+            // Sparkline
+            recentVoltages.push(parseFloat(voltage));
+            if (recentVoltages.length > 40) recentVoltages.shift();
+            renderSparkline();
+
+            // Time calc
+            let timeLabel = 'Inactivo', timeVal = '—', timeSub = '', progressPct = soc, progressColor = 'var(--dim)';
+            if(isCharging && curAbs > 0.5){
+                const ahNeed = capTotNum - capRemNum;
+                const hours = ahNeed / curAbs;
+                timeLabel = 'Tiempo restante (carga)'; timeVal = fmtTime(hours);
+                timeSub = ahNeed.toFixed(1) + ' Ah × ' + curAbs.toFixed(1) + ' A';
+                progressColor = 'var(--success)';
+            }else if(isDischarging && curAbs > 0.5){
+                const hours = capRemNum / curAbs;
+                timeLabel = 'Tiempo restante (descarga)'; timeVal = fmtTime(hours);
+                timeSub = capRemNum.toFixed(1) + ' Ah ÷ ' + curAbs.toFixed(1) + ' A';
+                progressColor = 'var(--info)';
+            }else{
+                timeSub = 'Sin corriente significativa';
+            }
+
+            // Dashboard
+            $('dashSoc').textContent = soc+'%';
+            const circ = 2 * Math.PI * 82;
+            $('ringFill').style.strokeDashoffset = circ * (1 - soc/100);
+            $('ringFill').style.stroke = isCharging ? 'var(--success)' : isDischarging ? 'var(--info)' : 'var(--dim)';
+            $('dashCapLabel').textContent = capTotNum > 0 ? capTotNum.toFixed(0) + ' Ah' : '320 Ah';
+
+            $('dashV').textContent = voltage;
+            $('dashI').textContent = (parseFloat(current)>0?'+':'')+current;
+            $('dashP').textContent = (parseFloat(power)>0?'+':'')+power;
+            $('dashCapRem').textContent = capRem;
+            $('dashCapTot').textContent = capTot;
+            $('dashCyc').textContent = cycles;
+            $('dashCells').textContent = cellCount ? cellCount+'S' : '—';
+            $('dashVer').textContent = swVersion ? (swVersion/10).toFixed(1) : '—';
+            $('dashProt').textContent = protStatus===0 ? 'OK' : '0x'+protStatus.toString(16).toUpperCase();
+            $('dashProt').style.color = protStatus===0 ? 'var(--success)' : 'var(--danger)';
+
+            $('dashTimeLabel').textContent = timeLabel;
+            $('dashTime').textContent = timeVal;
+            $('dashTimeSub').textContent = timeSub;
+            $('timeProgress').style.width = progressPct+'%';
+            $('timeProgress').style.background = progressColor;
+
+            const badge = $('connBadge');
+            if(isCharging){ badge.textContent='CARGANDO'; badge.className='badge badge-charging'; }
+            else if(isDischarging){ badge.textContent='DESCARGANDO'; badge.className='badge badge-discharging'; }
+            else { badge.textContent='IDLE'; badge.className='badge badge-idle'; }
+
+            $('dashFetChg').innerHTML = (fetStatus & 0x01) ? '<span class="bms-tag" style="background:rgba(34,197,94,0.15);color:var(--success)">ON</span>' : '<span class="bms-tag" style="background:rgba(239,68,68,0.15);color:var(--danger)">OFF</span>';
+            $('dashFetDsc').innerHTML = (fetStatus & 0x02) ? '<span class="bms-tag" style="background:rgba(34,197,94,0.15);color:var(--success)">ON</span>' : '<span class="bms-tag" style="background:rgba(239,68,68,0.15);color:var(--danger)">OFF</span>';
+            const balActive = (balLow !== 0 || balHigh !== 0);
+            $('dashBal').innerHTML = balActive ? '<span class="bms-tag" style="background:rgba(245,158,11,0.15);color:var(--warning)">Activo</span>' : '<span style="color:var(--dim)">Inactivo</span>';
+            $('dashLast').textContent = new Date().toLocaleTimeString('es-ES',{hour12:false});
+
+            const tg = $('tempGrid');
+            tg.innerHTML = '';
+            if(temps.length === 0){
+                tg.innerHTML = '<div class="temp-item" style="grid-column:1/-1;"><span>Sin sensores</span>—</div>';
+            }else{
+                temps.forEach((t,i)=>{
+                    const div = document.createElement('div');
+                    div.className = 'temp-item';
+                    div.innerHTML = '<span>NTC '+(i+1)+'</span>'+t.toFixed(1)+'°C';
+                    tg.appendChild(div);
+                });
+            }
+
+            saveReading({
+                voltage: parseFloat(voltage), current: parseFloat(current), power: parseFloat(power),
+                soc: soc, capacityRemaining: capRemNum, capacityTotal: capTotNum, cycles: cycles,
+                temperatures: temps, fetStatus: fetStatus, protStatus: protStatus, cellCount: cellCount
+            });
+        }
+
+        function fmtTime(hours){
+            if(!isFinite(hours)||hours<=0) return '—';
+            const d=Math.floor(hours/24), h=Math.floor(hours%24), m=Math.floor((hours%1)*60);
+            if(d>0) return `${d}d ${h}h ${m}m`;
+            if(h>0) return `${h}h ${m}m`;
+            return `${m} min`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  SPARKLINE
+        // ═══════════════════════════════════════════════════════════════
+        function renderSparkline() {
+            if (recentVoltages.length < 3) { $('sparkWrap').classList.add('hidden'); return; }
+            $('sparkWrap').classList.remove('hidden');
+            const svg = $('sparkSvg');
+            const path = $('sparkPath');
+            const area = $('sparkArea');
+            const W = 300, H = 40;
+            const minV = Math.min(...recentVoltages) - 0.1;
+            const maxV = Math.max(...recentVoltages) + 0.1;
+            const range = maxV - minV || 1;
+            let d = '';
+            recentVoltages.forEach((v, i) => {
+                const x = (i / (recentVoltages.length - 1)) * W;
+                const y = H - ((v - minV) / range) * H;
+                d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+            });
+            path.setAttribute('d', d);
+            area.setAttribute('d', d + 'L' + W + ',' + H + ' L0,' + H + ' Z');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  HISTORY / CHARTS
+        // ═══════════════════════════════════════════════════════════════
+        async function loadChartData() {
+            chartData = await getAllReadings();
+            renderChart();
+            updateStats();
+        }
+
+        function renderChart() {
+            const svg = $('chartSvg');
+            const grid = $('chartGrid');
+            const labels = $('chartLabels');
+            const pathV = $('pathV');
+            const pathI = $('pathI');
+            const pathSOC = $('pathSOC');
+            const areaV = $('areaV');
+            const areaI = $('areaI');
+            const areaSOC = $('areaSOC');
+            const pointsV = $('pointsV');
+            const pointsI = $('pointsI');
+            const pointsSOC = $('pointsSOC');
+            const zeroLine = $('zeroLine');
+
+            if (chartData.length < 2) {
+                grid.innerHTML = ''; labels.innerHTML = '';
+                pathV.setAttribute('d', ''); pathI.setAttribute('d', ''); pathSOC.setAttribute('d', '');
+                areaV.setAttribute('d', ''); areaI.setAttribute('d', ''); areaSOC.setAttribute('d', '');
+                pointsV.innerHTML = ''; pointsI.innerHTML = ''; pointsSOC.innerHTML = '';
+                zeroLine.setAttribute('x1',0); zeroLine.setAttribute('y1',0);
+                zeroLine.setAttribute('x2',0); zeroLine.setAttribute('y2',0);
+                return;
+            }
+
+            const W = 640, H = 220;
+            const margin = { top: 16, right: 50, bottom: 26, left: 50 };
+            const w = W - margin.left - margin.right;
+            const h = H - margin.top - margin.bottom;
+            const data = chartData.slice(-120);
+            const minT = data[0].timestamp;
+            const maxT = data[data.length - 1].timestamp;
+            const timeRange = maxT - minT || 1;
+
+            const volts = data.map(d => d.voltage);
+            const curs = data.map(d => d.current);
+            const socs = data.map(d => d.soc);
+
+            let minV = Math.min(...volts) - 0.3;
+            let maxV = Math.max(...volts) + 0.3;
+            if (maxV - minV < 0.5) { const mid = (minV + maxV) / 2; minV = mid - 0.25; maxV = mid + 0.25; }
+            const vRange = (maxV - minV) || 1;
+
+            let minI = Math.min(...curs);
+            let maxI = Math.max(...curs);
+            const iPad = Math.max(1, (maxI - minI) * 0.1);
+            minI -= iPad; maxI += iPad;
+            if (maxI - minI < 2) { const mid = (minI + maxI) / 2; minI = mid - 1; maxI = mid + 1; }
+            const iRange = (maxI - minI) || 1;
+
+            const minSOC = 0, maxSOC = 100;
+
+            const xOf = (t) => margin.left + ((t - minT) / timeRange) * w;
+            const yV = (v) => margin.top + h - ((v - minV) / vRange) * h;
+            const yI = (i) => margin.top + h - ((i - minI) / iRange) * h;
+            const ySOC = (s) => margin.top + h - ((s - minSOC) / (maxSOC - minSOC)) * h;
+
+            let gridHtml = '', labelHtml = '';
+            for (let i = 0; i <= 4; i++) {
+                const y = margin.top + (h * i / 4);
+                gridHtml += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + w}" y2="${y}"/>`;
+                const vVal = maxV - (vRange * i / 4);
+                labelHtml += `<text x="${margin.left - 8}" y="${y + 3}" text-anchor="end" fill="var(--success)" font-size="9" font-weight="600">${vVal.toFixed(1)}</text>`;
+                const iVal = maxI - (iRange * i / 4);
+                labelHtml += `<text x="${margin.left + w + 8}" y="${y + 3}" text-anchor="start" fill="var(--info)" font-size="9" font-weight="600">${iVal.toFixed(1)}</text>`;
+            }
+            const timeSteps = 4;
+            for (let i = 0; i <= timeSteps; i++) {
+                const x = margin.left + (w * i / timeSteps);
+                const t = minT + (timeRange * i / timeSteps);
+                const timeStr = new Date(t).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit', hour12:false});
+                labelHtml += `<text x="${x}" y="${H - 5}" text-anchor="middle" fill="var(--dim)" font-size="8">${timeStr}</text>`;
+            }
+            grid.innerHTML = gridHtml;
+            labels.innerHTML = labelHtml;
+
+            if (minI <= 0 && maxI >= 0) {
+                const zy = yI(0);
+                zeroLine.setAttribute('x1', margin.left);
+                zeroLine.setAttribute('y1', zy);
+                zeroLine.setAttribute('x2', margin.left + w);
+                zeroLine.setAttribute('y2', zy);
+            } else {
+                zeroLine.setAttribute('x1',0); zeroLine.setAttribute('y1',0);
+                zeroLine.setAttribute('x2',0); zeroLine.setAttribute('y2',0);
+            }
+
+            let dV = '', dI = '', dSOC = '';
+            const ptsV = [], ptsI = [], ptsSOC = [];
+            data.forEach((d, i) => {
+                const x = xOf(d.timestamp);
+                const yv = yV(d.voltage);
+                const yi = yI(d.current);
+                const ys = ySOC(d.soc);
+                const cmd = i === 0 ? 'M' : 'L';
+                dV += `${cmd}${x.toFixed(1)},${yv.toFixed(1)} `;
+                dI += `${cmd}${x.toFixed(1)},${yi.toFixed(1)} `;
+                dSOC += `${cmd}${x.toFixed(1)},${ys.toFixed(1)} `;
+                ptsV.push({x, y: yv, data: d});
+                ptsI.push({x, y: yi, data: d});
+                ptsSOC.push({x, y: ys, data: d});
+            });
+
+            const aV = dV + `L${margin.left + w},${margin.top + h} L${margin.left},${margin.top + h} Z`;
+            const aI = dI + `L${margin.left + w},${margin.top + h} L${margin.left},${margin.top + h} Z`;
+            const aSOC = dSOC + `L${margin.left + w},${margin.top + h} L${margin.left},${margin.top + h} Z`;
+
+            pathV.setAttribute('d', dV);
+            pathI.setAttribute('d', dI);
+            pathSOC.setAttribute('d', dSOC);
+            areaV.setAttribute('d', aV);
+            areaI.setAttribute('d', aI);
+            areaSOC.setAttribute('d', aSOC);
+
+            const step = Math.max(1, Math.floor(ptsV.length / 25));
+            let pvHtml = '', piHtml = '', psHtml = '';
+            for (let i = 0; i < ptsV.length; i += step) {
+                pvHtml += `<circle cx="${ptsV[i].x.toFixed(1)}" cy="${ptsV[i].y.toFixed(1)}" r="2.5" fill="var(--success)" opacity="0.85"/>`;
+                piHtml += `<circle cx="${ptsI[i].x.toFixed(1)}" cy="${ptsI[i].y.toFixed(1)}" r="2.5" fill="var(--info)" opacity="0.85"/>`;
+                psHtml += `<circle cx="${ptsSOC[i].x.toFixed(1)}" cy="${ptsSOC[i].y.toFixed(1)}" r="1.5" fill="#a78bfa" opacity="0.7"/>`;
+            }
+            pointsV.innerHTML = pvHtml;
+            pointsI.innerHTML = piHtml;
+            pointsSOC.innerHTML = psHtml;
+
+            const tooltip = $('chartTooltip');
+            svg.onmousemove = (e) => {
+                const rect = svg.getBoundingClientRect();
+                const mx = (e.clientX - rect.left) * (W / rect.width);
+                let closest = null, minDist = Infinity;
+                for (const p of ptsV) {
+                    const dist = Math.abs(p.x - mx);
+                    if (dist < minDist) { minDist = dist; closest = p; }
+                }
+                if (closest && minDist < 35) {
+                    const d = closest.data;
+                    const date = new Date(d.timestamp).toLocaleTimeString('es-ES', {hour12:false, second:'2-digit'});
+                    tooltip.innerHTML = `
+                        <div style="font-size:.62rem;color:var(--muted);margin-bottom:3px;font-weight:600;">${date}</div>
+                        <div style="color:var(--success);font-weight:700;">⚡ ${d.voltage.toFixed(2)} V</div>
+                        <div style="color:var(--info);font-weight:700;">🔌 ${d.current > 0 ? '+' : ''}${d.current.toFixed(2)} A</div>
+                        <div style="color:#a78bfa;font-weight:700;">🔋 ${d.soc}%</div>
+                        <div style="font-size:.6rem;color:var(--dim);margin-top:3px;">${d.power.toFixed(0)} W · ${d.cycles} ciclos</div>
+                    `;
+                    tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+                    tooltip.style.top = (e.clientY - rect.top - 55) + 'px';
+                    tooltip.style.opacity = '1';
+                } else {
+                    tooltip.style.opacity = '0';
+                }
+            };
+            svg.onmouseleave = () => { tooltip.style.opacity = '0'; };
+        }
+
+        async function updateStats() {
+            const data = await getAllReadings();
+            $('statCount').textContent = data.length.toLocaleString('es-ES');
+            if (data.length === 0) {
+                $('statFirst').textContent = '—';
+                $('statLast').textContent = '—';
+                $('statVrange').textContent = '—';
+                $('statIrange').textContent = '—';
+                $('statSocAvg').textContent = '—';
+                $('statSOCrange').textContent = '—';
+                return;
+            }
+            const volts = data.map(d => d.voltage);
+            const curs = data.map(d => d.current);
+            const socs = data.map(d => d.soc);
+            $('statFirst').textContent = new Date(data[0].timestamp).toLocaleString('es-ES', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+            $('statLast').textContent = new Date(data[data.length-1].timestamp).toLocaleString('es-ES', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+            $('statVrange').textContent = Math.min(...volts).toFixed(2) + ' / ' + Math.max(...volts).toFixed(2) + ' V';
+            $('statIrange').textContent = Math.min(...curs).toFixed(2) + ' / ' + Math.max(...curs).toFixed(2) + ' A';
+            $('statSocAvg').textContent = (socs.reduce((a,b)=>a+b,0)/socs.length).toFixed(1) + '%';
+            $('statSOCrange').textContent = Math.min(...socs) + '% / ' + Math.max(...socs) + '%';
+        }
+
+        async function exportCSV() {
+            haptic(15);
+            const data = await getAllReadings();
+            if (data.length === 0) { showToast('No hay datos para exportar', 'warn'); return; }
+            let csv = 'timestamp,voltage,current,power,soc,capacity_remaining,capacity_total,cycles,temperatures\n';
+            for (const d of data) {
+                csv += `${new Date(d.timestamp).toISOString()},${d.voltage},${d.current},${d.power},${d.soc},${d.capacityRemaining},${d.capacityTotal},${d.cycles},"${(d.temperature||[]).join(';')}"\n`;
+            }
+            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sako_battery_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Exportados ${data.length.toLocaleString('es-ES')} registros`, 'success');
+            log('Exportados '+data.length+' registros a CSV', 'log-info');
+        }
+
+        async function clearHistory() {
+            haptic([20, 30, 20]);
+            if (!confirm('¿Borrar TODO el historial almacenado? Esta acción no se puede deshacer.')) return;
+            await clearAllReadings();
+            showToast('Historial borrado', 'success');
+            log('Historial borrado por usuario', 'log-warn');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  INSPECTOR
+        // ═══════════════════════════════════════════════════════════════
+        function inspectPacket(packet, dataLen){
+            const data = packet.slice(4, 4+dataLen);
+            let html = '<div class="hex-grid">';
+            html += '<div class="hex-cell hdr">Off</div>';
+            for(let i=0;i<8;i++) html += '<div class="hex-cell hdr">+'+i+'</div>';
+            for(let row=0; row<Math.ceil(data.length/8); row++){
+                html += '<div class="hex-cell off">'+String(row*8).padStart(2,'0')+'</div>';
+                for(let col=0; col<8; col++){
+                    const idx = row*8+col;
+                    if(idx < data.length){
+                        let cls = 'hex-cell data';
+                        if(idx===0||idx===1) cls='hex-cell hl-v';
+                        else if(idx===2||idx===3) cls='hex-cell hl-i';
+                        else if(idx===4||idx===5) cls='hex-cell hl-c';
+                        else if(idx===6||idx===7) cls='hex-cell hl-c';
+                        else if(idx===8||idx===9) cls='hex-cell hl-cyc';
+                        else if(idx===18) cls='hex-cell hl-soc';
+                        else if(idx>=22) cls='hex-cell hl-t';
+                        html += '<div class="'+cls+'">'+data[idx].toString(16).padStart(2,'0').toUpperCase()+'</div>';
+                    } else html += '<div class="hex-cell">--</div>';
+                }
+            }
+            html += '</div>';
+            $('hexDump').innerHTML = html;
+
+            let tbody = '';
+            for(let i=0; i<data.length; i++){
+                const b = data[i];
+                const be16 = (i+1<data.length) ? ((data[i]<<8)|data[i+1]) : null;
+                const le16 = (i+1<data.length) ? ((data[i+1]<<8)|data[i]) : null;
+                const be16s = (i+1<data.length) ? (be16>32767?be16-65536:be16) : null;
+                const le16s = (i+1<data.length) ? (le16>32767?le16-65536:le16) : null;
+                const tempK = (i+1<data.length) ? ((be16/10)-273.15).toFixed(1) : null;
+                let guess = '';
+                if(i===0||i===1) guess = 'Voltaje total (uint16/100)';
+                else if(i===2||i===3) guess = 'Corriente (int16/100)';
+                else if(i===4||i===5) guess = 'Cap. restante (uint16/100)';
+                else if(i===6||i===7) guess = 'Cap. nominal (uint16/100)';
+                else if(i===8||i===9) guess = 'Ciclos (uint16)';
+                else if(i===10||i===11) guess = 'Fecha producción';
+                else if(i===12||i===13) guess = 'Balance status low';
+                else if(i===14||i===15) guess = 'Balance status high';
+                else if(i===16) guess = 'Protection status (u8)';
+                else if(i===17) guess = 'SW version (u8)';
+                else if(i===18) guess = 'RSOC % (u8)';
+                else if(i===19) guess = 'FET status (u8)';
+                else if(i===20) guess = 'Cell count (u8)';
+                else if(i===21) guess = 'NTC bytes (u8)';
+                else if(i>=22) guess = 'Temp'+(Math.floor((i-22)/2)+1)+' (K/10→°C)';
+                let mc = '';
+                if(be16!==null){
+                    const v = be16/100;
+                    if(Math.abs(v-55.0)<5 || Math.abs(v-13.0)<2) mc='match-exact';
+                    else if(Math.abs(v-320)<10) mc='match-exact';
+                    else if(be16>=2500&&be16<=3500) mc='match-near';
+                }
+                tbody += '<tr>';
+                tbody += '<td>'+String(i).padStart(2,'0')+'</td>';
+                tbody += '<td style="font-family:monospace;font-weight:700;">'+b.toString(16).padStart(2,'0').toUpperCase()+'</td>';
+                tbody += '<td>'+b+'</td>';
+                tbody += '<td class="'+mc+'">'+(be16!==null?(be16/100).toFixed(2):'—')+'</td>';
+                tbody += '<td>'+(le16!==null?(le16/100).toFixed(2):'—')+'</td>';
+                tbody += '<td>'+(be16s!==null?(be16s/100).toFixed(2):'—')+'</td>';
+                tbody += '<td>'+(le16s!==null?(le16s/100).toFixed(2):'—')+'</td>';
+                tbody += '<td>'+(tempK!==null?tempK+'°C':'—')+'</td>';
+                tbody += '<td style="color:var(--muted);font-size:.68rem;">'+guess+'</td>';
+                tbody += '</tr>';
+            }
+            $('candidateBody').innerHTML = tbody;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  PULL TO REFRESH (robusto)
+        // ═══════════════════════════════════════════════════════════════
+        let ptrStartY = 0, ptrPulling = false, ptrTriggered = false;
+
+        function getScrollTop() {
+            return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        }
+
+        document.addEventListener('touchstart', e => {
+            ptrStartY = e.touches[0].clientY;
+            ptrPulling = getScrollTop() <= 1;
+            ptrTriggered = false;
+        }, {passive:true});
+
+        document.addEventListener('touchmove', e => {
+            if (!ptrPulling) return;
+            const dy = e.touches[0].clientY - ptrStartY;
+            if (dy > 0 && getScrollTop() <= 1) {
+                // Mostrar indicador progresivamente
+                const progress = Math.min(dy / 70, 1);
+                const indicator = $('ptrIndicator');
+                indicator.style.top = (-50 + (progress * 66)) + 'px';
+                indicator.style.opacity = progress;
+                indicator.querySelector('.ptr-spinner').style.transform = 'rotate(' + (progress * 360) + 'deg)';
+                if (dy > 70 && !ptrTriggered) {
+                    ptrTriggered = true;
+                    haptic(15);
+                }
+                // Prevenir rubber-banding del navegador
+                if (dy > 20) {
+                    e.preventDefault();
+                }
+            }
+        }, {passive:false});
+
+        document.addEventListener('touchend', async () => {
+            const indicator = $('ptrIndicator');
+            indicator.style.top = '-50px';
+            indicator.style.opacity = '0';
+            indicator.querySelector('.ptr-spinner').style.transform = 'rotate(0deg)';
+
+            if (ptrTriggered) {
+                indicator.classList.add('visible');
+                indicator.style.top = '16px';
+                indicator.style.opacity = '1';
+                indicator.querySelector('.ptr-spinner').style.animation = 'spin .6s linear infinite';
+
+                if (viewMode === 'history') {
+                    await loadChartData();
+                    showToast('Historial actualizado', 'success');
+                } else if (isConnected) {
+                    await sendCmd(CMD_INFO);
+                    showToast('Datos actualizados', 'success');
+                } else {
+                    showToast('Desliza en Historial para sincronizar', 'info');
+                }
+
+                setTimeout(() => {
+                    indicator.classList.remove('visible');
+                    indicator.style.top = '-50px';
+                    indicator.style.opacity = '0';
+                    indicator.querySelector('.ptr-spinner').style.animation = '';
+                }, 800);
+            }
+            ptrPulling = false;
+            ptrTriggered = false;
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        //  INIT
+        // ═══════════════════════════════════════════════════════════════
+        async function init() {
+            try {
+                db = await openDB();
+                log('IndexedDB inicializada');
+            } catch(e) {
+                log('IndexedDB error: ' + e.message, 'log-err');
+            }
+            // Position nav indicator
+            const activeBtn = document.querySelector('.nav-item[data-mode="dashboard"]');
+            if (activeBtn) {
+                const nav = $('bottomNav');
+                const indicator = $('navIndicator');
+                const rect = activeBtn.getBoundingClientRect();
+                const navRect = nav.getBoundingClientRect();
+                indicator.style.left = (rect.left - navRect.left + rect.width/2 - 20) + 'px';
+            }
+            setTimeout(async () => {
+                const connected = await tryAutoConnect();
+                if (!connected) {
+                    log('SAKO Battery Pro v6.0 · PWA Ready');
+                    log('Pulsa "Conectar" y selecciona tu batería SAKO');
+                }
+            }, 600);
+        }
+
+        init();
+    </script>
+</body>
+</html>

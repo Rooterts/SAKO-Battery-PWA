@@ -1,0 +1,55 @@
+{
+    "version": "1.0.0",
+    "name": "SAKO Battery Pro",
+    "short_name": "SAKO Battery",
+    "description": "Monitor BLE en tiempo real para baterías SAKO con BMS JBD. Dashboard, historial, export CSV.",
+    "lang": "es",
+    "dir": "ltr",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#09090b",
+    "theme_color": "#09090b",
+    "categories": ["utilities", "productivity", "tools"],
+    "id": "/sako-battery-pro",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "./assets/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "./assets/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "./assets/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "./assets/icons/icon-512-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Inicio",
+            "url": "./?view=dashboard"
+        },
+        {
+            "name": "Historial",
+            "short_name": "Historial",
+            "url": "./?view=history"
+        }
+    ]
+}

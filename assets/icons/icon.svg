@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0a0a0c"/>
+            <stop offset="100%" stop-color="#1a1a1f"/>
+        </linearGradient>
+        <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#34d399"/>
+            <stop offset="100%" stop-color="#10b981"/>
+        </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- rounded background -->
+    <rect width="512" height="512" rx="112" ry="112" fill="url(#bg)"/>
+    <rect x="2" y="2" width="508" height="508" rx="110" ry="110" fill="none" stroke="rgba(16,185,129,0.18)" stroke-width="2"/>
+
+    <!-- battery body -->
+    <g transform="translate(110 130)">
+        <rect x="0" y="0" width="262" height="252" rx="32" ry="32"
+              fill="none" stroke="rgba(16,185,129,0.5)" stroke-width="8"/>
+        <!-- battery tip -->
+        <rect x="262" y="80" width="22" height="92" rx="11" ry="11" fill="rgba(16,185,129,0.5)"/>
+        <!-- charge fill (~80%) -->
+        <rect x="14" y="14" width="234" height="224" rx="20" ry="20" fill="rgba(16,185,129,0.08)"/>
+        <rect x="14" y="14" width="184" height="224" rx="20" ry="20" fill="url(#bolt)" opacity="0.85"/>
+    </g>
+
+    <!-- lightning bolt -->
+    <g filter="url(#glow)">
+        <path d="M 268 110 L 188 270 L 250 270 L 226 400 L 322 232 L 260 232 L 296 110 Z"
+              fill="#a7f3d0" stroke="#34d399" stroke-width="4" stroke-linejoin="round"/>
+    </g>
+</svg>
