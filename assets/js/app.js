@@ -18,19 +18,19 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredInstallPrompt = e;
     const btn = $('installBtn');
     if (btn) btn.classList.remove('hidden');
-    log('App instalable disponible', 'log-info');
+    log(L('pwa_available'), 'log-info');
 });
 window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
     const btn = $('installBtn');
     if (btn) btn.classList.add('hidden');
-    showToast('App instalada correctamente', 'success');
+    showToast(L('toast_install_success'), 'success');
 });
 
 async function installApp() {
     haptic(15);
     if (!deferredInstallPrompt) {
-        showToast('La app ya está instalada o no se puede instalar aquí', 'info');
+        showToast('App already installed or cannot be installed here', 'info');
         return;
     }
     deferredInstallPrompt.prompt();
@@ -150,7 +150,7 @@ const I18N = {
         searching: 'Buscando ',
         reconnect_fail: 'Reconexión fallida: ',
         gatt_connected: 'GATT conectado',
-        connection_error: 'Error de conexión: ',
+        connection_error: 'Connection error: ',
         requesting_device: 'Solicitando dispositivo BLE…',
         requesting: 'Solicitando…',
         // Dashboard
@@ -199,10 +199,10 @@ const I18N = {
         toast_auto_connected: 'Autoconectado',
         toast_history_updated: 'Historial actualizado',
         toast_data_updated: 'Datos actualizados',
-        toast_export_none: 'No hay datos para exportar',
+        toast_export_none: 'No data to export',
         toast_exported: 'Exportados ',
         toast_history_cleared: 'Historial borrado',
-        toast_already_installed: 'La app ya está instalada o no se puede instalar aquí',
+        toast_already_installed: 'App already installed or cannot be installed here',
         toast_install_success: 'App instalada correctamente',
         toast_install_choice: 'Install choice: ',
         // confirm
@@ -274,7 +274,7 @@ function applyStrings() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  Primer arranque: hint de instalación legacy (sólo UI hint)
+//  First boot: install hint for browsers that suppress beforeinstallprompt
 // ═══════════════════════════════════════════════════════════════
 if (!localStorage.getItem('sako_hint_shown')) {
     setTimeout(() => { const h = $('installHint'); if (h) h.classList.remove('hidden'); }, 2500);
@@ -482,15 +482,15 @@ if (!localStorage.getItem('sako_hint_shown')) {
                         if (ok) return true;
                     }
                 } catch (err) {
-                    log('getDevices() falló: ' + err.message, 'log-warn');
+                    log('getDevices() failed: ' + err.message, 'log-warn');
                 }
             }
             $('statusDot').classList.remove('connecting');
             $('statusText').textContent = 'Desconectado';
             if (navigator.bluetooth.getDevices) {
-                $('autoConnectMsg').textContent = '⚠️ Permisos BLE expirados. Usa "Reconectar rápido".';
+                $('autoConnectMsg').textContent = L('ble_expired');
             } else {
-                $('autoConnectMsg').textContent = 'ℹ️ Autoconexión no soportada. Usa "Reconectar rápido".';
+                $('autoConnectMsg').textContent = L('ble_nosupport');
                 $('bleSupportMsg').textContent = 'Puede necesitar chrome://flags/#enable-experimental-web-platform-features';
             }
             return false;
@@ -499,12 +499,12 @@ if (!localStorage.getItem('sako_hint_shown')) {
         async function quickReconnect() {
             haptic(20);
             const lastName = await getSetting('lastDeviceName', '');
-            log('Reconexión rápida a: ' + (lastName || 'dispositivo guardado'));
+            log('Quick reconnect to: ' + (lastName || 'saved device'));
             try {
                 $('connectBtn').disabled = true;
                 $('reconnectBtn').disabled = true;
                 $('statusDot').classList.add('connecting');
-                $('statusText').textContent = 'Solicitando…';
+                $('statusText').textContent = L('requesting');
                 let dev;
                 try {
                     if (lastName && lastName.length > 2) {
@@ -525,7 +525,7 @@ if (!localStorage.getItem('sako_hint_shown')) {
                     await doConnect(dev, false);
                 }
             } catch (err) {
-                log('Reconexión rápida fallida: ' + err.message, 'log-err');
+                log('Quick reconnect failed: ' + err.message, 'log-err');
                 showToast(err.message, 'error');
             } finally {
                 $('connectBtn').disabled = false;
@@ -563,7 +563,7 @@ if (!localStorage.getItem('sako_hint_shown')) {
                 $('liveBadge').classList.remove('hidden');
                 $('modeRow') && $('modeRow').classList.remove('hidden');
                 $(viewMode==='dashboard'?'viewDashboard': viewMode==='history'?'viewHistory':'viewInspector').classList.remove('hidden');
-                $('autoConnectMsg').textContent = isAuto ? '✅ Reconectado automáticamente' : '✅ Conectado. Se recordará para la próxima vez.';
+                $('autoConnectMsg').textContent = isAuto ? L('auto_reconnected') : L('connected_remember');
                 $('bleSupportMsg').textContent = '';
                 showToast((isAuto ? 'Autoconectado' : 'Conectado') + ' a ' + (device.name || 'BMS'), 'success');
                 haptic([30, 50, 30]);
@@ -580,7 +580,7 @@ if (!localStorage.getItem('sako_hint_shown')) {
                 $('statusDot').classList.remove('connecting');
                 $('statusText').textContent = 'Desconectado';
                 $('autoConnectMsg').textContent = 'Error: ' + err.message;
-                log('Error de conexión: ' + err.message, 'log-err');
+                log('Connection error: ' + err.message, 'log-err');
                 device = null;
                 return false;
             }
@@ -594,9 +594,9 @@ const JBD_NAME_PREFIXES = ['SAKO', 'BMS', 'BT-', 'Li-ion', 'JK', 'JBD', 'DALY'];
 
         async function connect(){
             haptic(20);
-            log('Solicitando dispositivo BLE…');
+            log(L('requesting_device'));
             try{
-                if(!navigator.bluetooth){ showToast('Usa Chrome/Edge en Android/PC', 'warn'); return; }
+                if(!navigator.bluetooth){ showToast('Use Chrome/Edge on Android/PC', 'warn'); return; }
                 $('connectBtn').disabled = true;
                 const dev = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
@@ -1071,7 +1071,7 @@ const JBD_NAME_PREFIXES = ['SAKO', 'BMS', 'BT-', 'Li-ion', 'JK', 'JBD', 'DALY'];
         async function exportCSV() {
             haptic(15);
             const data = await getAllReadings();
-            if (data.length === 0) { showToast('No hay datos para exportar', 'warn'); return; }
+            if (data.length === 0) { showToast('No data to export', 'warn'); return; }
             let csv = 'timestamp,voltage,current,power,soc,capacity_remaining,capacity_total,cycles,temperatures\n';
             for (const d of data) {
                 csv += `${new Date(d.timestamp).toISOString()},${d.voltage},${d.current},${d.power},${d.soc},${d.capacityRemaining},${d.capacityTotal},${d.cycles},"${(d.temperature||[]).join(';')}"\n`;
@@ -1091,10 +1091,10 @@ const JBD_NAME_PREFIXES = ['SAKO', 'BMS', 'BT-', 'Li-ion', 'JK', 'JBD', 'DALY'];
 
         async function clearHistory() {
             haptic([20, 30, 20]);
-            if (!confirm('¿Borrar TODO el historial almacenado? Esta acción no se puede deshacer.')) return;
+            if (!confirm(L('confirm_clear_history'))) return;
             await clearAllReadings();
             showToast('Historial borrado', 'success');
-            log('Historial borrado por usuario', 'log-warn');
+            log('History cleared by user', 'log-warn');
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -1139,7 +1139,7 @@ const JBD_NAME_PREFIXES = ['SAKO', 'BMS', 'BT-', 'Li-ion', 'JK', 'JBD', 'DALY'];
                 else if(i===4||i===5) guess = 'Cap. restante (uint16/100)';
                 else if(i===6||i===7) guess = 'Cap. nominal (uint16/100)';
                 else if(i===8||i===9) guess = 'Ciclos (uint16)';
-                else if(i===10||i===11) guess = 'Fecha producción';
+                else if(i===10||i===11) guess = 'Production date';
                 else if(i===12||i===13) guess = 'Balance status low';
                 else if(i===14||i===15) guess = 'Balance status high';
                 else if(i===16) guess = 'Protection status (u8)';
@@ -1226,7 +1226,7 @@ const JBD_NAME_PREFIXES = ['SAKO', 'BMS', 'BT-', 'Li-ion', 'JK', 'JBD', 'DALY'];
                     await sendCmd(CMD_INFO);
                     showToast('Datos actualizados', 'success');
                 } else {
-                    showToast('Desliza en Historial para sincronizar', 'info');
+                    showToast('Swipe down in History to sync', 'info');
                 }
 
                 setTimeout(() => {

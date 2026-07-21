@@ -129,4 +129,4 @@ SAKO-Battery-PWA/
 
 ## License
 
-MIT © 2025 [Adrián Pérez Pérez (@Rooterts)](https://github.com/Rooterts)
+MIT 

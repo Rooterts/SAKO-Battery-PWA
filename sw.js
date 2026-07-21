@@ -28,8 +28,8 @@ const SHELL_ASSETS = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(SHELL_CACHE).then((cache) => {
-            // addAll falla si UNA sola URL 404. Usamos add uno por uno para
-            // que un icono faltante no rompa la instalación completa.
+            // addAll fails if ANY single URL 404s. We use add one-by-one so
+            // a missing icon does not break the whole installation.
             return Promise.all(
                 SHELL_ASSETS.map((url) =>
                     cache.add(url).catch((err) => {
@@ -41,7 +41,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// ─── ACTIVATE: limpia caches viejos ───────────────────────────
+// ─── ACTIVATE: clean old caches ───────────────────────────
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) =>
@@ -58,12 +58,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const req = event.request;
 
-    // Sólo GET · ignorar Web Bluetooth (chrome-extension://, blob:, data:, etc.)
+    // GET only · ignore non-http(s) (chrome-extension://, blob:, data:, etc.)
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
-    // Cache-first para assets del shell (misma-origen, navegación, scripts, css)
+    // Cache-first for shell assets (same-origin, navigation, scripts, css)
     const isShellAsset =
         req.mode === 'navigate' ||
         (req.destination === 'script') ||
@@ -77,14 +77,14 @@ self.addEventListener('fetch', (event) => {
             caches.match(req).then((cached) => {
                 if (cached) return cached;
                 return fetch(req).then((res) => {
-                    // cachear respuestas válidas para la próxima
+                    // Cache valid responses for the next visit
                     if (res && res.status === 200) {
                         const copy = res.clone();
                         caches.open(SHELL_CACHE).then((c) => c.put(req, copy));
                     }
                     return res;
                 }).catch(() => {
-                    // Fallback offline para navegación → index.html cacheado
+                    // Offline fallback for navigation → return cached index.html
                     if (req.mode === 'navigate') {
                         return caches.match('./index.html');
                     }
@@ -94,7 +94,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Resto: network-first, fallback a cache, fallback a offline genérico
+    // Everything else: network-first, fallback to cache, fallback to 503
     event.respondWith(
         fetch(req).then((res) => {
             if (res && res.status === 200 && req.url.startsWith(self.location.origin)) {
@@ -108,7 +108,7 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// ─── Mensaje desde la página: forzar skipWaiting ──────────────
+// ─── Message from page: force skipWaiting ────────────────────
 self.addEventListener('message', (event) => {
     if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });

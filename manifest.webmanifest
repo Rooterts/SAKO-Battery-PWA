@@ -2,7 +2,7 @@
     "version": "1.0.0",
     "name": "SAKO Battery Pro",
     "short_name": "SAKO Battery",
-    "description": "Monitor BLE en tiempo real para baterías SAKO con BMS JBD. Dashboard, historial, export CSV.",
+    "description": "Real-time BLE monitor for SAKO / JBD battery management systems. Dashboard, history, CSV export.",
     "lang": "es",
     "dir": "ltr",
     "start_url": "./",

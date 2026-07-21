@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#09090b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="Monitor BLE en tiempo real para baterías SAKO con BMS JBD. Dashboard, historial, export CSV.">
+    <meta name="description" content="Real-time BLE monitor for SAKO / JBD BMS. Dashboard, history, CSV export.">
     <title>SAKO Battery Pro</title>
 
     <!-- PWA manifest -->
@@ -20,7 +20,7 @@
     <!-- estilos -->
     <link rel="stylesheet" href="assets/css/styles.css">
 
-    <!-- Install button (visible solo cuando beforeinstallprompt.fire) -->
+    <!-- Install button (visible only when beforeinstallprompt fires) -->
     <style>
         #installBtn {
             display: none;
@@ -34,7 +34,7 @@
 </head>
 <body>
     <div class="ptr-indicator" id="ptrIndicator">
-        <div class="ptr-spinner"></div> Sincronizando…
+        <div class="ptr-spinner"></div> Syncing…
     </div>
 
     <header>
@@ -52,7 +52,7 @@
     </header>
 
     <div class="install-hint hidden anim-fade" id="installHint">
-        💡 <b>Consejo:</b> Toca ⋮ y selecciona <b>"Añadir a pantalla de inicio"</b> para usarla como app nativa.
+        💡 <b>Tip:</b> Tap ⋮ and select <b>"Add to Home Screen"</b> to use it as a native app.
     </div>
 
     <!-- CONNECT -->
@@ -62,25 +62,25 @@
                 <div class="status-dot" id="statusDot"></div>
                 <div class="status-dot-ring" id="statusRing"></div>
             </div>
-            <span class="status-text" id="statusText">Desconectado</span>
+            <span class="status-text" id="statusText">Disconnected</span>
             <span class="badge badge-idle" id="connBadge">BLE</span>
         </div>
         <div style="padding: 0 16px 16px;">
             <button class="btn" id="connectBtn" onclick="connect()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                Conectar batería SAKO
+                Connect SAKO battery
             </button>
             <button class="btn hidden" id="installBtn" onclick="installApp()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Instalar app
+                Install app
             </button>
             <button class="btn btn-info hidden" id="reconnectBtn" onclick="quickReconnect()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                Reconectar rápido
+                Quick reconnect
             </button>
             <button class="btn btn-danger hidden" id="disconnectBtn" onclick="disconnect()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                Desconectar
+                Disconnect
             </button>
             <div class="conn-info" id="autoConnectMsg"></div>
             <div class="conn-info" id="bleSupportMsg" style="font-size:.68rem;color:var(--dim);"></div>
@@ -116,7 +116,7 @@
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
             <div style="flex:1;min-width:0">
-                <div class="time-label" id="dashTimeLabel">Tiempo restante</div>
+                <div class="time-label" id="dashTimeLabel">Time remaining</div>
                 <div class="time-value" id="dashTime">—</div>
                 <div class="time-sub" id="dashTimeSub"></div>
                 <div class="progress-bar"><div class="progress-fill" id="timeProgress" style="width:0%; background:var(--success);"></div></div>
@@ -124,34 +124,34 @@
         </div>
 
         <div class="stats-grid anim-fade" style="animation-delay:.15s">
-            <div class="stat"><div class="stat-label">Voltaje</div><div class="stat-value" id="dashV">—</div><div class="stat-unit">V</div></div>
-            <div class="stat"><div class="stat-label">Corriente</div><div class="stat-value" id="dashI">—</div><div class="stat-unit">A</div></div>
-            <div class="stat"><div class="stat-label">Potencia</div><div class="stat-value" id="dashP">—</div><div class="stat-unit">W</div></div>
-            <div class="stat"><div class="stat-label">Cap. rest.</div><div class="stat-value" id="dashCapRem">—</div><div class="stat-unit">Ah</div></div>
+            <div class="stat"><div class="stat-label">Voltage</div><div class="stat-value" id="dashV">—</div><div class="stat-unit">V</div></div>
+            <div class="stat"><div class="stat-label">Current</div><div class="stat-value" id="dashI">—</div><div class="stat-unit">A</div></div>
+            <div class="stat"><div class="stat-label">Power</div><div class="stat-value" id="dashP">—</div><div class="stat-unit">W</div></div>
+            <div class="stat"><div class="stat-label">Cap. rem.</div><div class="stat-value" id="dashCapRem">—</div><div class="stat-unit">Ah</div></div>
             <div class="stat"><div class="stat-label">Cap. total</div><div class="stat-value" id="dashCapTot">—</div><div class="stat-unit">Ah</div></div>
-            <div class="stat"><div class="stat-label">Ciclos</div><div class="stat-value" id="dashCyc">—</div><div class="stat-unit">#</div></div>
-            <div class="stat"><div class="stat-label">Celdas</div><div class="stat-value" id="dashCells">—</div><div class="stat-unit">S</div></div>
-            <div class="stat"><div class="stat-label">Versión SW</div><div class="stat-value" id="dashVer">—</div><div class="stat-unit"></div></div>
-            <div class="stat"><div class="stat-label">Protección</div><div class="stat-value" id="dashProt">—</div><div class="stat-unit"></div></div>
+            <div class="stat"><div class="stat-label">Cycles</div><div class="stat-value" id="dashCyc">—</div><div class="stat-unit">#</div></div>
+            <div class="stat"><div class="stat-label">Cells</div><div class="stat-value" id="dashCells">—</div><div class="stat-unit">S</div></div>
+            <div class="stat"><div class="stat-label">SW Ver.</div><div class="stat-value" id="dashVer">—</div><div class="stat-unit"></div></div>
+            <div class="stat"><div class="stat-label">Protection</div><div class="stat-value" id="dashProt">—</div><div class="stat-unit"></div></div>
         </div>
 
-        <div class="section-title">Temperaturas</div>
+        <div class="section-title">Temperatures</div>
         <div class="temp-grid" id="tempGrid"></div>
 
-        <div class="section-title">Estado del BMS</div>
+        <div class="section-title">BMS Status</div>
         <div class="card" style="margin-top:0;">
             <div class="card-body" style="padding: 8px 16px;">
-                <div class="bms-row"><span>MOSFET carga</span><span id="dashFetChg">—</span></div>
-                <div class="bms-row"><span>MOSFET descarga</span><span id="dashFetDsc">—</span></div>
+                <div class="bms-row"><span>Charge MOSFET</span><span id="dashFetChg">—</span></div>
+                <div class="bms-row"><span>Discharge MOSFET</span><span id="dashFetDsc">—</span></div>
                 <div class="bms-row"><span>Balance</span><span id="dashBal">—</span></div>
-                <div class="bms-row"><span>Último paquete</span><span id="dashLast">—</span></div>
+                <div class="bms-row"><span>Last packet</span><span id="dashLast">—</span></div>
             </div>
         </div>
     </div>
 
     <!-- HISTORY -->
     <div id="viewHistory" class="view-section hidden">
-        <div class="section-title">Gráfico de tendencias</div>
+        <div class="section-title">Trend Chart</div>
         <div class="chart-wrap" id="chartWrap">
             <svg class="chart-svg" id="chartSvg" viewBox="0 0 640 220" preserveAspectRatio="none">
                 <defs>
@@ -184,27 +184,27 @@
             <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#a78bfa"></div>SOC</div>
         </div>
 
-        <div class="section-title">Estadísticas de sesión</div>
+        <div class="section-title">Session Statistics</div>
         <div class="card" style="margin-top:0;">
             <div class="card-body" id="statsBody">
-                <div class="stat-row"><span>Lecturas almacenadas</span><span id="statCount">—</span></div>
-                <div class="stat-row"><span>Primera lectura</span><span id="statFirst">—</span></div>
-                <div class="stat-row"><span>Última lectura</span><span id="statLast">—</span></div>
-                <div class="stat-row"><span>Voltaje máx. / mín.</span><span id="statVrange">—</span></div>
-                <div class="stat-row"><span>Corriente máx. / mín.</span><span id="statIrange">—</span></div>
-                <div class="stat-row"><span>SOC promedio</span><span id="statSocAvg">—</span></div>
-                <div class="stat-row"><span>SOC máx. / mín.</span><span id="statSOCrange">—</span></div>
+                <div class="stat-row"><span>Stored readings</span><span id="statCount">—</span></div>
+                <div class="stat-row"><span>First reading</span><span id="statFirst">—</span></div>
+                <div class="stat-row"><span>Last reading</span><span id="statLast">—</span></div>
+                <div class="stat-row"><span>Voltage max / min</span><span id="statVrange">—</span></div>
+                <div class="stat-row"><span>Current max / min</span><span id="statIrange">—</span></div>
+                <div class="stat-row"><span>SOC average</span><span id="statSocAvg">—</span></div>
+                <div class="stat-row"><span>SOC max / min</span><span id="statSOCrange">—</span></div>
             </div>
         </div>
 
         <div class="db-controls">
             <button class="btn btn-ghost" onclick="exportCSV()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Exportar CSV
+                Export CSV
             </button>
             <button class="btn btn-ghost" onclick="clearHistory()" style="color:var(--danger);border-color:rgba(239,68,68,0.3)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                Borrar historial
+                Clear history
             </button>
         </div>
     </div>
@@ -213,13 +213,13 @@
     <div id="viewInspector" class="view-section hidden">
         <div class="card anim-fade" style="animation-delay:.05s">
             <div class="card-header">
-                <span class="card-title">🧬 Hex dump · paquete 0x03</span>
-                <button class="btn btn-sm" onclick="clearPackets()">Limpiar</button>
+                <span class="card-title">🧬 Hex dump · packet 0x03</span>
+                <button class="btn btn-sm" onclick="clearPackets()">Clear</button>
             </div>
             <div class="card-body">
                 <div id="hexDump" style="color:var(--muted); font-size:.8rem; text-align:center; padding:30px 20px;">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:10px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><br/>
-                    Conecta y espera un paquete…
+                    Connect and wait for a packet…
                 </div>
                 <div style="margin-top:12px; font-size:.62rem; color:var(--dim); display:flex; flex-wrap:wrap; gap:10px;">
                     <span><span class="hex-cell hl-v" style="display:inline-block;width:10px;height:10px;padding:0;border-radius:2px"></span> Voltaje</span>
@@ -233,7 +233,7 @@
         </div>
 
         <div class="card anim-fade" style="animation-delay:.1s">
-            <div class="card-header"><span class="card-title">🔎 Candidatos (todos los offsets)</span></div>
+            <div class="card-header"><span class="card-title">🔎 Candidates (all offsets)</span></div>
             <div class="card-body" style="padding:0; overflow-x:auto;">
                 <table class="candidate-table">
                     <thead><tr>
@@ -241,7 +241,7 @@
                         <th>i16BE/100</th><th>i16LE/100</th><th>u16BE/10−273</th><th>Campo JBD</th>
                     </tr></thead>
                     <tbody id="candidateBody"><tr><td colspan="9" style="text-align:center;color:var(--muted);padding:30px 20px;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><br/>Esperando paquetes…
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.5" style="margin-bottom:8px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><br/>Waiting for packets…
                     </td></tr></tbody>
                 </table>
             </div>
@@ -258,15 +258,15 @@
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav" id="bottomNav">
         <div class="nav-indicator" id="navIndicator" style="left:0"></div>
-        <button class="nav-item active" onclick="setMode('dashboard')" data-mode="dashboard">
+        <button class="nav-item active" onclick="setMode('dashboard')" data-mode="dashboard" data-i18n-nav="nav_dashboard">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
         </button>
-        <button class="nav-item" onclick="setMode('history')" data-mode="history">
+        <button class="nav-item" onclick="setMode('history')" data-mode="history" data-i18n-nav="nav_history">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Historial
+            History
         </button>
-        <button class="nav-item" onclick="setMode('inspector')" data-mode="inspector">
+        <button class="nav-item" onclick="setMode('inspector')" data-mode="inspector" data-i18n-nav="nav_inspector">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             Inspector
         </button>
